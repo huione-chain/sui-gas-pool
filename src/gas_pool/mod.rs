@@ -62,8 +62,8 @@ mod tests {
             .is_err());
 
         let (tx_data, user_sig) = create_test_transaction(&test_cluster, sponsor, gas_coins).await;
-        let effects = station
-            .execute_transaction(reservation_id, tx_data, user_sig)
+        let (_, effects, _) = station
+            .execute_transaction(reservation_id, tx_data, None, user_sig)
             .await
             .unwrap();
         assert!(effects.status().is_ok());
@@ -89,7 +89,7 @@ mod tests {
             &keypair,
         );
         let result = station
-            .execute_transaction(reservation_id, tx_data, user_sig.into())
+            .execute_transaction(reservation_id, tx_data, None, user_sig.into())
             .await;
         println!("{:?}", result);
         assert!(result.is_err());
@@ -116,7 +116,7 @@ mod tests {
         assert_eq!(station.query_pool_available_coin_count().await, 1);
         let (tx_data, user_sig) = create_test_transaction(&test_cluster, sponsor, gas_coins).await;
         assert!(station
-            .execute_transaction(reservation_id, tx_data, user_sig)
+            .execute_transaction(reservation_id, tx_data, None, user_sig)
             .await
             .is_err());
         station
@@ -144,13 +144,13 @@ mod tests {
             create_test_transaction(&test_cluster, sponsor, incomplete_gas_coins).await;
         // It should fail because it's inconsistent with the reservation.
         assert!(station
-            .execute_transaction(reservation_id, tx_data, user_sig)
+            .execute_transaction(reservation_id, tx_data, None, user_sig)
             .await
             .is_err());
 
         let (tx_data, user_sig) = create_test_transaction(&test_cluster, sponsor, gas_coins).await;
         let effects = station
-            .execute_transaction(reservation_id, tx_data, user_sig)
+            .execute_transaction(reservation_id, tx_data, None, user_sig)
             .await
             .unwrap();
         assert!(effects.status().is_ok());
@@ -179,13 +179,13 @@ mod tests {
         let (tx_data, user_sig) =
             create_test_transaction(&test_cluster, sponsor, mixed_up_gas_coins).await;
         assert!(station
-            .execute_transaction(reservation_id1, tx_data, user_sig)
+            .execute_transaction(reservation_id1, tx_data, None, user_sig)
             .await
             .is_err());
 
         let (tx_data, user_sig) = create_test_transaction(&test_cluster, sponsor, gas_coins1).await;
         let effects = station
-            .execute_transaction(reservation_id1, tx_data, user_sig)
+            .execute_transaction(reservation_id1, tx_data, None, user_sig)
             .await
             .unwrap();
         assert!(effects.status().is_ok());

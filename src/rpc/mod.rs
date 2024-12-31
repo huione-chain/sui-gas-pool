@@ -30,7 +30,7 @@ mod tests {
 
         let (tx_data, user_sig) = create_test_transaction(&test_cluster, sponsor, gas_coins).await;
         let effects = client
-            .execute_tx(reservation_id, &tx_data, &user_sig)
+            .execute_tx(reservation_id, &tx_data, None, &user_sig)
             .await
             .unwrap();
         assert!(effects.status().is_ok());
