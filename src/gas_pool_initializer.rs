@@ -334,14 +334,14 @@ mod tests {
     use crate::storage::connect_storage_for_testing;
     use crate::sui_client::SuiClient;
     use crate::test_env::start_sui_cluster;
-    use sui_types::gas_coin::MIST_PER_SUI;
+    use sui_types::gas_coin::MIST_PER_HC;
 
     // TODO: Add more accurate tests.
 
     #[tokio::test]
     async fn test_basic_init_flow() {
         telemetry_subscribers::init_for_testing();
-        let (cluster, signer) = start_sui_cluster(vec![1000 * MIST_PER_SUI]).await;
+        let (cluster, signer) = start_sui_cluster(vec![1000 * MIST_PER_HC]).await;
         let fullnode_url = cluster.fullnode_handle.rpc_url;
         let storage = connect_storage_for_testing(signer.get_address()).await;
         let sui_client = SuiClient::new(&fullnode_url, None).await;
@@ -349,7 +349,7 @@ mod tests {
             sui_client,
             storage.clone(),
             CoinInitConfig {
-                target_init_balance: MIST_PER_SUI,
+                target_init_balance: MIST_PER_HC,
                 refresh_interval_sec: 200,
             },
             signer,
@@ -361,10 +361,10 @@ mod tests {
     #[tokio::test]
     async fn test_init_non_even_split() {
         telemetry_subscribers::init_for_testing();
-        let (cluster, signer) = start_sui_cluster(vec![10000000 * MIST_PER_SUI]).await;
+        let (cluster, signer) = start_sui_cluster(vec![10000000 * MIST_PER_HC]).await;
         let fullnode_url = cluster.fullnode_handle.rpc_url;
         let storage = connect_storage_for_testing(signer.get_address()).await;
-        let target_init_balance = 12345 * MIST_PER_SUI;
+        let target_init_balance = 12345 * MIST_PER_HC;
         let sui_client = SuiClient::new(&fullnode_url, None).await;
         let _ = GasPoolInitializer::start(
             sui_client,
@@ -382,7 +382,7 @@ mod tests {
     #[tokio::test]
     async fn test_add_new_funds_to_pool() {
         telemetry_subscribers::init_for_testing();
-        let (cluster, signer) = start_sui_cluster(vec![1000 * MIST_PER_SUI]).await;
+        let (cluster, signer) = start_sui_cluster(vec![1000 * MIST_PER_HC]).await;
         let sponsor = signer.get_address();
         let fullnode_url = cluster.fullnode_handle.rpc_url.clone();
         let storage = connect_storage_for_testing(signer.get_address()).await;
@@ -391,7 +391,7 @@ mod tests {
             sui_client,
             storage.clone(),
             CoinInitConfig {
-                target_init_balance: MIST_PER_SUI,
+                target_init_balance: MIST_PER_HC,
                 refresh_interval_sec: 1,
             },
             signer,
@@ -411,7 +411,7 @@ mod tests {
             .test_transaction_builder_with_sender(new_addr)
             .await
             .transfer_sui(
-                Some(NEW_COIN_BALANCE_FACTOR_THRESHOLD * MIST_PER_SUI),
+                Some(NEW_COIN_BALANCE_FACTOR_THRESHOLD * MIST_PER_HC),
                 sponsor,
             )
             .build();

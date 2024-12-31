@@ -12,7 +12,7 @@ mod tests {
     use sui_json_rpc_types::SuiTransactionBlockEffectsAPI;
     use sui_types::{
         crypto::{get_account_key_pair, Signature},
-        gas_coin::MIST_PER_SUI,
+        gas_coin::MIST_PER_HC,
         programmable_transaction_builder::ProgrammableTransactionBuilder,
         transaction::{TransactionData, TransactionKind},
     };
@@ -20,16 +20,16 @@ mod tests {
     #[tokio::test]
     async fn test_station_reserve_gas() {
         let (_test_cluster, container) =
-            start_gas_station(vec![MIST_PER_SUI; 10], MIST_PER_SUI).await;
+            start_gas_station(vec![MIST_PER_HC; 10], MIST_PER_HC).await;
         let station = container.get_gas_pool_arc();
         let (sponsor1, _res_id1, gas_coins) = station
-            .reserve_gas(MIST_PER_SUI * 3, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC * 3, Duration::from_secs(10))
             .await
             .unwrap();
         assert_eq!(gas_coins.len(), 3);
         assert_eq!(station.query_pool_available_coin_count().await, 7);
         let (sponsor2, _res_id2, gas_coins) = station
-            .reserve_gas(MIST_PER_SUI * 7, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC * 7, Duration::from_secs(10))
             .await
             .unwrap();
         assert_eq!(gas_coins.len(), 7);
@@ -43,15 +43,15 @@ mod tests {
 
     #[tokio::test]
     async fn test_e2e_gas_station_flow() {
-        let (test_cluster, container) = start_gas_station(vec![MIST_PER_SUI], MIST_PER_SUI).await;
+        let (test_cluster, container) = start_gas_station(vec![MIST_PER_HC], MIST_PER_HC).await;
         let station = container.get_gas_pool_arc();
         assert!(station
-            .reserve_gas(MIST_PER_SUI + 1, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC + 1, Duration::from_secs(10))
             .await
             .is_err());
 
         let (sponsor, reservation_id, gas_coins) = station
-            .reserve_gas(MIST_PER_SUI, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC, Duration::from_secs(10))
             .await
             .unwrap();
         assert_eq!(gas_coins.len(), 1);
@@ -73,10 +73,10 @@ mod tests {
     #[tokio::test]
     async fn test_invalid_transaction() {
         telemetry_subscribers::init_for_testing();
-        let (_test_cluster, container) = start_gas_station(vec![MIST_PER_SUI], MIST_PER_SUI).await;
+        let (_test_cluster, container) = start_gas_station(vec![MIST_PER_HC], MIST_PER_HC).await;
         let station = container.get_gas_pool_arc();
         let (sponsor, reservation_id, gas_coins) = station
-            .reserve_gas(MIST_PER_SUI, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC, Duration::from_secs(10))
             .await
             .unwrap();
         let (sender, keypair) = get_account_key_pair();
@@ -99,10 +99,10 @@ mod tests {
     #[tokio::test]
     async fn test_coin_expiration() {
         telemetry_subscribers::init_for_testing();
-        let (test_cluster, container) = start_gas_station(vec![MIST_PER_SUI], MIST_PER_SUI).await;
+        let (test_cluster, container) = start_gas_station(vec![MIST_PER_HC], MIST_PER_HC).await;
         let station = container.get_gas_pool_arc();
         let (sponsor, reservation_id, gas_coins) = station
-            .reserve_gas(MIST_PER_SUI, Duration::from_secs(1))
+            .reserve_gas(MIST_PER_HC, Duration::from_secs(1))
             .await
             .unwrap();
         assert_eq!(gas_coins.len(), 1);
@@ -129,10 +129,10 @@ mod tests {
     #[tokio::test]
     async fn test_incomplete_gas_usage() {
         let (test_cluster, container) =
-            start_gas_station(vec![MIST_PER_SUI; 10], MIST_PER_SUI).await;
+            start_gas_station(vec![MIST_PER_HC; 10], MIST_PER_HC).await;
         let station = container.get_gas_pool_arc();
         let (sponsor, reservation_id, gas_coins) = station
-            .reserve_gas(MIST_PER_SUI * 3, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC * 3, Duration::from_secs(10))
             .await
             .unwrap();
         assert_eq!(gas_coins.len(), 3);
@@ -160,15 +160,15 @@ mod tests {
     #[tokio::test]
     async fn test_mixed_up_gas_coins() {
         let (test_cluster, container) =
-            start_gas_station(vec![MIST_PER_SUI; 10], MIST_PER_SUI).await;
+            start_gas_station(vec![MIST_PER_HC; 10], MIST_PER_HC).await;
         let station = container.get_gas_pool_arc();
         let (sponsor, reservation_id1, gas_coins1) = station
-            .reserve_gas(MIST_PER_SUI * 3, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC * 3, Duration::from_secs(10))
             .await
             .unwrap();
         assert_eq!(gas_coins1.len(), 3);
         let (_, _res_id2, gas_coins2) = station
-            .reserve_gas(MIST_PER_SUI, Duration::from_secs(10))
+            .reserve_gas(MIST_PER_HC, Duration::from_secs(10))
             .await
             .unwrap();
         assert_eq!(gas_coins2.len(), 1);
